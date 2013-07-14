@@ -4,6 +4,7 @@ package com.example.ffm;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,12 +21,15 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +56,16 @@ public class MainActivity extends Activity implements SensorEventListener  {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+	
+		/*Button addContact =  (Button) findViewById(R.id.button1);
+
+        addContact.setOnClickListener(l)setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+            }
+        });*/
+		
+		
 		mSensorManager = (SensorManager) getSystemService (Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager.getDefaultSensor (Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener (this, mAccelerometer, 
@@ -60,34 +74,17 @@ public class MainActivity extends Activity implements SensorEventListener  {
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy); 
 		
-		btnShowLocation = (Button) findViewById(R.id.button1);
-        
-		// show location button click event
-        btnShowLocation.setOnClickListener(new View.OnClickListener() {
-             
-            @Override
-            public void onClick(View arg0) {        
-                // create class object
-                gps = new GPS(MainActivity.this);
- 
-                // check if GPS enabled     
-                if(gps.canGetLocation()){
-                     
-                    double latitude = gps.latitude;
-                    double longitude = gps.longitude;
-                     
-                    // \n is for new line
-                    Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();    
-                }else{
-                    // can't get location
-                    // GPS or Network is not enabled
-                    // Ask user to enable GPS/network in settings
-                    gps.showSettingsAlert();
-                }
-                 
-            }
-        });
+		ImageView iv = (ImageView)findViewById(R.id.imageView1);
+		iv.setVisibility(View.INVISIBLE
+				
+				);
 		
+		
+		TextView home = (TextView)findViewById(R.id.textView1);
+		
+		home.setHeight(200);
+		home.setTextSize(40);
+		home.setText("\nWaiting 4 U 2 Be Hit By A Truck!! LOL");
 		//TextView tv=(TextView)findViewById(R.id.textView1);
 		//TextView tv2=(TextView)findViewById(R.id.textView2);
 		//_getLocation(tv);
@@ -174,13 +171,22 @@ public class MainActivity extends Activity implements SensorEventListener  {
 
 			double latitude = gps.latitude;
 			double longitude = gps.longitude;
-			String phoneNo = "08105874995";
+			String phoneNo[] = new String[5]; 
+					phoneNo[0]="08790598796";
+					phoneNo[1]="09503747599";
+					phoneNo[2]="09501278080";
+					phoneNo[3]="08987765820";
+					phoneNo[4]="09566812573";
 			
-			String sms = "Help! I had an Accident!! \nLat: "+latitude+"\nLong:  "+longitude;
+			String sms = "Help! I had an Accident!! \nLat: "+latitude+"\nLong:  "+longitude,sms2="";
 			String geo="";
 			try {
 				geo = returnBossGeo(latitude, longitude);
-				sms+="\n"+geo;
+				String arradd[] = new String[2];
+				arradd=geo.split(";");
+				sms+="\n"+arradd[0];
+				arradd[1]=arradd[1].replace(" ", "+");
+				sms2="\n https://www.google.co.in/maps/preview#!q="+arradd[1];
 			}  catch (NullPointerException e1) {
 				// TODO Auto-generated catch block
 				Toast.makeText (getApplicationContext (), 
@@ -194,7 +200,9 @@ public class MainActivity extends Activity implements SensorEventListener  {
 			
 			if(lock==1)
 			{
+				
 			//smsManager.sendTextMessage (phoneNo, null, sms, null, null);
+			//smsManager.sendTextMessage (phoneNo, null, sms2, null, null);
 			lock++;
 			
 			}
@@ -259,6 +267,9 @@ public class MainActivity extends Activity implements SensorEventListener  {
 	}*/
 	public boolean isAboveThreshold ()
 	{
+		
+		
+		
 		  Double ampX = Math.pow(deltaX, 2);
 		  Double ampY = Math.pow(deltaY, 2);
 		  Double ampZ = Math.pow(deltaZ, 2);
@@ -266,8 +277,33 @@ public class MainActivity extends Activity implements SensorEventListener  {
 		  Double aggAmp = Math.pow(sumAmp, 0.5);
 		if (aggAmp >= threshold)
 		{
-			Toast.makeText(getApplicationContext(), "aggAmp:"+aggAmp, Toast.LENGTH_LONG).show(); 
+
+			ImageView iv = (ImageView)findViewById(R.id.imageView1);
+			iv.setVisibility(View.VISIBLE);
+			/*new Handler().postDelayed(new Runnable()
+			{
+			    @Override
+			    public void run()
+			    {
+			    	Button exit = new Button(getApplicationContext());
+			    	exit.setOnClickListener(new View.OnClickListener() {
+			             public void onClick(View v) {
+			            	 
+			                 // Perform action on click
+			             }
+			         });
+			        //do your stuff here.
+			    }
+			}, 5000);*/
 			
+			
+			Toast.makeText(getApplicationContext(), "aggAmp:"+aggAmp, Toast.LENGTH_LONG).show(); 
+			TextView home = (TextView)findViewById(R.id.textView1);
+			
+			home.setHeight(200);
+			home.setTextSize(40);
+			home.setMarqueeRepeatLimit(10);
+			home.setText("\nReporting Accident !!!");
 			
 			return true;
 		}
@@ -366,21 +402,21 @@ public class MainActivity extends Activity implements SensorEventListener  {
 	  
 	street = xml.indexOf("<street>");
 	notStreet = xml.indexOf("</street>");
-	String _street = xml.substring(street+s.length()-1, notStreet);
+	String _street = xml.substring(street+s.length(), notStreet);
 
 	city = xml.indexOf("<city>");
 	notCity = xml.indexOf("</city>");
-	String _city = xml.substring(city+c.length()-1, notCity);
+	String _city = xml.substring(city+c.length(), notCity);
 
 	
 
 	state = xml.indexOf("<state>");
 	notState = xml.indexOf("</state>");
-	String _state = xml.substring(state+st.length()-1, notState);
+	String _state = xml.substring(state+st.length(), notState);
 
 	country = xml.indexOf("<country>");
 	notCountry = xml.indexOf("</country>");
-	String _country = xml.substring(country+co.length()-1, notCountry);
+	String _country = xml.substring(country+co.length(), notCountry);
 
 	
 	pin = xml.indexOf("<pin>");
@@ -390,12 +426,12 @@ public class MainActivity extends Activity implements SensorEventListener  {
 	if(pin>=0 && notPin>=0)
 	{
 		
-		_pin = xml.substring(pin+p.length()-1, notPin);
-		address =  _street+"\n" + _city+"\n" + _pin+"\n" + _state+"\n" + _country;
+		_pin = xml.substring(pin+p.length(), notPin);
+		address =  _street+"\n" + _city+"\n" + _pin+"\n" + _state+"\n" + _country+";"+_street+"+" + _city;
 	}
 	else
 	{
-		address =  _street+"\n" + _city+"\n" + _state+"\n" + _country;
+		address =  _street+"\n" + _city+"\n" + _state+"\n" + _country +";"+_street+"+" + _city;
 		
 	}
 	
